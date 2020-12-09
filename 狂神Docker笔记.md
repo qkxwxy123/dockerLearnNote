@@ -86,3 +86,22 @@ docker kill 容器id     # 强制停止当前容器
 
 
 ### 常用其他命令
+
+**后台启动容器**
+
+```shell
+# 通过命令docker run -d 镜像名
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker run -d centos
+
+# 问题docker ps，发现 centos 停止了
+
+# 常见的坑，docker 容器使用后台运行，就必须要有一个前台进程，docker发现没有应用，就会自动停止。
+# 比如nginx，容器启动后发现自己没有提供服务，就会立刻停止，就是没有程序了（垃圾回收机制）
+```
+
+**查看日志**
+
+```shell
+docker logs
+```
+

@@ -100,6 +100,247 @@ docker kill 容器id     # 强制停止当前容器
 **查看日志**
 
 ```shell
-docker logssss
+docker logs -f -t --tail 容器，没有日志
+
+# 自己编写一段shell脚本
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker run -d centos /bin/sh -c "while true;do echo kxxy; sleep 1; done"
+
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+e8b0b46f444d        centos              "/bin/sh -c 'while t…"   4 seconds ago       Up 3 seconds                            affectionate_mcnulty
+
+# 显示日志
+ -tf           # f -follow持续显示日志，t时间戳
+ --tail number # 要显示的日志行数
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker logs -tf --tail 10 e8b0b46f444d
+
 ```
 
+**查看容器中进程信息**
+
+```shell
+# 命令 docker top 容器id
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker top e8b0b46f444d
+UID                 PID                 PPID                C                   STIME     
+root                28821               28804               0                   14:45     
+root                29447               28821               0                   14:50     
+```
+
+**查看镜像的元数据**
+
+```shell
+# 命令
+docker inspect 容器id
+
+# 测试
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker inspect e8b0b46f444d
+[
+    {
+        "Id": "e8b0b46f444d352243c3b3d4ab58df326cfc1d857dac00b33cd8f8f4f09b3c1f",
+        "Created": "2020-12-10T06:45:41.694915332Z",
+        "Path": "/bin/sh",
+        "Args": [
+            "-c",
+            "while true;do echo kxxy; sleep 1; done"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 28821,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2020-12-10T06:45:42.37550912Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:300e315adb2f96afe5f0b2780b87f28ae95231fe3bdd1e16b9ba606307728f55",
+        "ResolvConfPath": "/var/lib/docker/containers/e8b0b46f444d352243c3b3d4ab58df326cfc1d857dac00b33cd8f8f4f09b3c1f/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/e8b0b46f444d352243c3b3d4ab58df326cfc1d857dac00b33cd8f8f4f09b3c1f/hostname",
+        "HostsPath": "/var/lib/docker/containers/e8b0b46f444d352243c3b3d4ab58df326cfc1d857dac00b33cd8f8f4f09b3c1f/hosts",
+        "LogPath": "/var/lib/docker/containers/e8b0b46f444d352243c3b3d4ab58df326cfc1d857dac00b33cd8f8f4f09b3c1f/e8b0b46f444d352243c3b3d4ab58df326cfc1d857dac00b33cd8f8f4f09b3c1f-json.log",
+        "Name": "/affectionate_mcnulty",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Capabilities": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "KernelMemory": 0,
+            "KernelMemoryTCP": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/28119bd7b7a6a10b44c846a17d9c57e0dfba046e5cd4af6ea47e8a5a99ed8f3b-init/diff:/var/lib/docker/overlay2/7762de1c34b1663532d9c1f47fa4a316787208eec60ead4f1f32c2e02ed1c915/diff",
+                "MergedDir": "/var/lib/docker/overlay2/28119bd7b7a6a10b44c846a17d9c57e0dfba046e5cd4af6ea47e8a5a99ed8f3b/merged",
+                "UpperDir": "/var/lib/docker/overlay2/28119bd7b7a6a10b44c846a17d9c57e0dfba046e5cd4af6ea47e8a5a99ed8f3b/diff",
+                "WorkDir": "/var/lib/docker/overlay2/28119bd7b7a6a10b44c846a17d9c57e0dfba046e5cd4af6ea47e8a5a99ed8f3b/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "e8b0b46f444d",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "while true;do echo kxxy; sleep 1; done"
+            ],
+            "Image": "centos",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "org.label-schema.build-date": "20201204",
+                "org.label-schema.license": "GPLv2",
+                "org.label-schema.name": "CentOS Base Image",
+                "org.label-schema.schema-version": "1.0",
+                "org.label-schema.vendor": "CentOS"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "a97d0ac9c52e49ce8c1f2834c3df62c0ff25afe6c994366d870b977913cce250",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/a97d0ac9c52e",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "252517f9b82b12b414f17e56c58c606aeacf4524389fbd1c08c7a08433870bee",
+            "Gateway": "172.18.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.18.0.3",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:12:00:03",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "1223cf8fa88c7b74f3bd7b36b788a4c2b2247bca404aa05d0ba53bad78d3b2ca",
+                    "EndpointID": "252517f9b82b12b414f17e56c58c606aeacf4524389fbd1c08c7a08433870bee",
+                    "Gateway": "172.18.0.1",
+                    "IPAddress": "172.18.0.3",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:12:00:03",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+```
+
+**进入当前正在运行的容器**

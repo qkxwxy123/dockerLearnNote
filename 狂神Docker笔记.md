@@ -100,6 +100,6 @@ docker kill 容器id     # 强制停止当前容器
 **查看日志**
 
 ```shell
-docker logs
+docker logssss
 ```
 

@@ -344,3 +344,11 @@ docker inspect 容器id
 ```
 
 **进入当前正在运行的容器**
+
+```shell
+# 我们通常容器都是使用后台方式运行的，需要进入容器，修改一些配置
+
+# 命令
+docker exec -it 容器id bashShell
+```
+

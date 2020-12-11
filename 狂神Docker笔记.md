@@ -350,5 +350,64 @@ docker inspect 容器id
 
 # 命令
 docker exec -it 容器id bashShell
+
+# 测试
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+e16e11186028        centos              "/bin/bash"         2 days ago          Up 2 days                               angry_banach
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker exec -it e16e11186028 /bin/bash
+[root@e16e11186028 /]# ls
+bin  dev  etc  home  lib  lib64  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+[root@e16e11186028 /]# ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 Dec08 pts/0    00:00:00 /bin/bash
+root        14     0  0 07:16 pts/1    00:00:00 /bin/bash
+root        28    14  0 07:16 pts/1    00:00:00 ps -ef
+
+# 方式二
+docker attach 容器id
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker attach e16e11186028
+[root@e16e11186028 /]# 
+进入后进到正在执行的代码...
+
+# docker exec      # 进入容器后开启一个新的终端，可以操作（常用）
+# docker attach    # 进入容器正在执行的终端，不会启动新的进程
+```
+
+**从容器内拷贝文件到主机**
+
+```shell
+docker cp 容器id:容器内路径  目的的主机路径
+
+# 查看当前主机
+[root@iz2ze4t93bwwn1hyg068wpz ~]# cd /home
+[root@iz2ze4t93bwwn1hyg068wpz home]# ls
+www
+
+# 进入docker容器
+[root@iz2ze4t93bwwn1hyg068wpz home]# docker attach e16e11186028
+[root@e16e11186028 /]# cd /home
+[root@e16e11186028 home]# ls
+[root@e16e11186028 home]# touch test.java
+[root@e16e11186028 home]# ls
+test.java
+[root@e16e11186028 home]# exit
+exit
+[root@iz2ze4t93bwwn1hyg068wpz home]# docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                       PORTS               NAMES
+e8b0b46f444d        centos              "/bin/sh -c 'while t…"   25 hours ago        Exited (137) 9 minutes ago                       affectionate_mcnulty
+38fa182feb55        centos              "/bin/sh -C 'while t…"   25 hours ago        Exited (127) 25 hours ago                        crazy_turing
+95c90efd4fd1        centos              "/bin/bash"              39 hours ago        Exited (0) 39 hours ago                          brave_brahmagupta
+e16e11186028        centos              "/bin/bash"              2 days ago          Exited (0) 8 seconds ago                         angry_banach
+7fd19a2cb21e        hello-world         "/hello"                 2 days ago          Exited (0) 2 days ago                            eager_varahamihira
+
+# 将文件拷贝出来
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker cp e16e11186028:/home/test.java /home
+[root@iz2ze4t93bwwn1hyg068wpz ~]# cd /home
+[root@iz2ze4t93bwwn1hyg068wpz ~]# cd /home
+[root@iz2ze4t93bwwn1hyg068wpz home]# ls
+kxxy.java  test.java  www
+
+# 拷贝是一个手动过程，未来我们使用-v卷计数，可以实现打通
 ```
 

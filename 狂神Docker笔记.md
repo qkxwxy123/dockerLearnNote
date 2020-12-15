@@ -411,3 +411,90 @@ kxxy.java  test.java  www
 # 拷贝是一个手动过程，未来我们使用-v卷计数，可以实现打通
 ```
 
+### 作业
+
+> Docker部署nginx
+
+```shell
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker search nginx
+NAME                               DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
+nginx                              Official build of Nginx.                        14133               [OK]                
+jwilder/nginx-proxy                Automated Nginx reverse proxy for docker con…   1921                                    [OK]
+richarvey/nginx-php-fpm            Container running Nginx + PHP-FPM capable of…   796                                     [OK]
+linuxserver/nginx                  An Nginx container, brought to you by LinuxS…   131                                     
+jc21/nginx-proxy-manager           Docker container for managing Nginx proxy ho…   118                                     
+tiangolo/nginx-rtmp                Docker image with Nginx using the nginx-rtmp…   106                                     [OK]
+bitnami/nginx                      Bitnami nginx Docker Image                      91                                      [OK]
+alfg/nginx-rtmp                    NGINX, nginx-rtmp-module and FFmpeg from sou…   81                                      [OK]
+jlesage/nginx-proxy-manager        Docker container for Nginx Proxy Manager        75                                      [OK]
+nginxdemos/hello                   NGINX webserver that serves a simple page co…   64                                      [OK]
+nginx/nginx-ingress                NGINX Ingress Controller for Kubernetes         46                                      
+privatebin/nginx-fpm-alpine        PrivateBin running on an Nginx, php-fpm & Al…   43                                      [OK]
+nginxinc/nginx-unprivileged        Unprivileged NGINX Dockerfiles                  27                                      
+schmunk42/nginx-redirect           A very simple container to redirect HTTP tra…   19                                      [OK]
+staticfloat/nginx-certbot          Opinionated setup for automatic TLS certs lo…   16                                      [OK]
+centos/nginx-112-centos7           Platform for running nginx 1.12 or building …   15                                      
+nginx/nginx-prometheus-exporter    NGINX Prometheus Exporter                       15                                      
+raulr/nginx-wordpress              Nginx front-end for the official wordpress:f…   13                                      [OK]
+centos/nginx-18-centos7            Platform for running nginx 1.8 or building n…   13                                      
+flashspys/nginx-static             Super Lightweight Nginx Image                   8                                       [OK]
+mailu/nginx                        Mailu nginx frontend                            8                                       [OK]
+bitwarden/nginx                    The Bitwarden nginx web server acting as a r…   7                                       
+bitnami/nginx-ingress-controller   Bitnami Docker Image for NGINX Ingress Contr…   7                                       [OK]
+ansibleplaybookbundle/nginx-apb    An APB to deploy NGINX                          1                                       [OK]
+wodby/nginx                        Generic nginx                                   1                                       [OK]
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker pull nginx
+Using default tag: latest
+latest: Pulling from library/nginx
+6ec7b7d162b2: Pull complete 
+bbce32568f49: Pull complete 
+5928664fb2b3: Pull complete 
+a85e904c7548: Pull complete 
+ac39958ca6b1: Pull complete 
+Digest: sha256:31de7d2fd0e751685e57339d2b4a4aa175aea922e592d36a7078d72db0a45639
+Status: Downloaded newer image for nginx:latest
+docker.io/library/nginx:latest
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+nginx               latest              7baf28ea91eb        4 days ago          133MB
+centos              latest              300e315adb2f        7 days ago          209MB
+mysql               5.7                 ae0658fdbad5        3 weeks ago         449MB
+mysql               latest              dd7265748b5d        3 weeks ago         545MB
+hello-world         latest              bf756fb1ae65        11 months ago       13.3kB
+
+# 运行测试，-d后台运行，--name起名字，-p暴露端口，3344为外部端口，可以从3344访问容器端口80
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker run -d --name nginx01 -p:3344:80 nginx
+3bff58e5c530bf9f833e4927b605afcccfa1a6cf1c7cb2c30a4016bd8c439829
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                  NAMES
+3bff58e5c530        nginx               "/docker-entrypoint.…"   6 seconds ago       Up 6 seconds        0.0.0.0:3344->80/tcp   nginx01
+# 内网访问
+[root@iz2ze4t93bwwn1hyg068wpz ~]# curl localhost:3344
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+```
+

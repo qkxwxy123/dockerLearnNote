@@ -413,7 +413,7 @@ kxxy.java  test.java  www
 
 ### 作业
 
-> Docker部署nginx
+> 作业1：Docker部署nginx
 
 ```shell
 [root@iz2ze4t93bwwn1hyg068wpz ~]# docker search nginx
@@ -496,5 +496,224 @@ Commercial support is available at
 </body>
 </html>
 
+# 进入容器
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker exec -it nginx01 /bin/bash
+root@3bff58e5c530:/# whereis eginx
+eginx:
+root@3bff58e5c530:/# whereis nginx
+nginx: /usr/sbin/nginx /usr/lib/nginx /etc/nginx /usr/share/nginx
+root@3bff58e5c530:/# cd /etc/ngin
+bash: cd: /etc/ngin: No such file or directory
+root@3bff58e5c530:/# cd /etc/nginx
+root@3bff58e5c530:/etc/nginx# ls
+conf.d	fastcgi_params	koi-utf  koi-win  mime.types  modules  nginx.conf  scgi_params	uwsgi_params  win-utf
 ```
 
+> 作业2：docker安装一个tomcat
+
+```shell
+# 官方的使用
+docker run -it --rm tomcat:9.0
+
+# 我们之前的启动都是后台，停止了容器之后，容器还是可以查到。 docker run -it --rm 一般用来测试，用完即删除容器，但是镜像还在。
+
+# 下载再启动
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker pull tomcat
+Using default tag: latest
+latest: Pulling from library/tomcat
+Digest: sha256:f728ca177fee0851aea29499fbb2013737231a00264f517cc3d185f6f8bf09a8
+Status: Downloaded newer image for tomcat:latest
+docker.io/library/tomcat:latest
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+tomcat              9.0                 6d15a1d68603        3 days ago          649MB
+tomcat              latest              6d15a1d68603        3 days ago          649MB
+nginx               latest              7baf28ea91eb        5 days ago          133MB
+centos              latest              300e315adb2f        8 days ago          209MB
+mysql               5.7                 ae0658fdbad5        3 weeks ago         449MB
+mysql               latest              dd7265748b5d        3 weeks ago         545MB
+hello-world         latest              bf756fb1ae65        11 months ago       13.3kB
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker run -d -p 3355:8080 --name tomcat01 tomcat
+150a71744fa8c44fe6399cf1d93dbf7f34a497559550c2ab2da7070cf254f7db
+
+# 测试访问没有问题，报404错误
+
+# 进入容器
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker exec -it tomcat01 /bin/bash
+root@150a71744fa8:/usr/local/tomcat# ls
+BUILDING.txt  CONTRIBUTING.md  LICENSE	NOTICE	README.md  RELEASE-NOTES  RUNNING.txt  bin  conf  lib  logs  native-jni-lib  temp  webapps  webapps.dist  work
+root@150a71744fa8:/usr/local/tomcat# ls -al
+total 176
+drwxr-xr-x 1 root root  4096 Dec 12 17:40 .
+drwxr-xr-x 1 root root  4096 Dec 16 08:10 ..
+-rw-r--r-- 1 root root 18982 Dec  3 11:48 BUILDING.txt
+-rw-r--r-- 1 root root  5409 Dec  3 11:48 CONTRIBUTING.md
+-rw-r--r-- 1 root root 57092 Dec  3 11:48 LICENSE
+-rw-r--r-- 1 root root  2333 Dec  3 11:48 NOTICE
+-rw-r--r-- 1 root root  3257 Dec  3 11:48 README.md
+-rw-r--r-- 1 root root  6898 Dec  3 11:48 RELEASE-NOTES
+-rw-r--r-- 1 root root 16507 Dec  3 11:48 RUNNING.txt
+drwxr-xr-x 2 root root  4096 Dec 12 17:41 bin
+drwxr-xr-x 1 root root  4096 Dec 16 08:10 conf
+drwxr-xr-x 2 root root  4096 Dec 12 17:40 lib
+drwxrwxrwx 1 root root  4096 Dec 16 08:10 logs
+drwxr-xr-x 2 root root  4096 Dec 12 17:40 native-jni-lib
+drwxrwxrwx 2 root root  4096 Dec 12 17:40 temp
+drwxr-xr-x 2 root root  4096 Dec 12 17:40 webapps
+drwxr-xr-x 7 root root  4096 Dec  3 11:45 webapps.dist
+drwxrwxrwx 2 root root  4096 Dec  3 11:43 work
+root@150a71744fa8:/usr/local/tomcat# cd webapps
+root@150a71744fa8:/usr/local/tomcat/webapps# ls
+root@150a71744fa8:/usr/local/tomcat/webapps# 
+
+# 发现问题：1.linux命令少了  2.没有webapps.
+# 原因：阿里云镜像问题，默认是最小的镜像，所有不必要的都删除掉，保证运行即可
+root@150a71744fa8:/usr/local/tomcat/webapps.dist# ls
+ROOT  docs  examples  host-manager  manager
+root@150a71744fa8:/usr/local/tomcat/webapps.dist# cd ..
+root@150a71744fa8:/usr/local/tomcat# cp webapps.dist/* webapps
+cp: -r not specified; omitting directory 'webapps.dist/ROOT'
+cp: -r not specified; omitting directory 'webapps.dist/docs'
+cp: -r not specified; omitting directory 'webapps.dist/examples'
+cp: -r not specified; omitting directory 'webapps.dist/host-manager'
+cp: -r not specified; omitting directory 'webapps.dist/manager'
+root@150a71744fa8:/usr/local/tomcat# cp -r webapps.dist/* webapps
+root@150a71744fa8:/usr/local/tomcat# cd webapps
+root@150a71744fa8:/usr/local/tomcat/webapps# ls
+ROOT  docs  examples  host-manager  manager
+root@150a71744fa8:/usr/local/tomcat/webapps# 
+# 发现webapps.dist里有，复制到webapps内，刷新页面即可
+```
+
+> 作业3：部署es+kibana
+
+```shell
+# es 暴露的端口很多！
+# es 十分的耗内存
+# es 的数据一般需要放置到安全目录，挂载
+
+# 下载启动
+docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.6.2
+
+# 启动后服务器就卡住了 docker stats 查看cpu的状态
+
+# 停止整个docker
+
+# 加上内存限制，修改配置  -e 环境配置修改
+docker run -d --name elasticsearch02 -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx512m" elasticsearch:7.6.2
+[root@iz2ze4t93bwwn1hyg068wpz ~]# curl localhost:9200
+{
+  "name" : "1d4ca35f2866",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "q0DNf6u9TAm3GGXM9j2pTQ",
+  "version" : {
+    "number" : "7.6.2",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "ef48eb35cf30adf4db14086e8aabd07ef6fb113f",
+    "build_date" : "2020-03-26T06:34:37.794943Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.4.0",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+# 访问成功
+```
+
+> 作业4：用kibana连接es
+
+### 可视化
+
+* portainer(先用这个)
+
+  ```shell
+  docker run -d -p 8089:9000 \
+  --restart=always -v /var/run/docker.sock:/var/run/docker.sock --privileged=true portainer/portainer
+  ```
+
+* Rancher(CI/CD再用)
+
+**什么是portainer？**
+
+Dokcer图形化管理工具！提供一个后台面板供我们操作
+
+```shell
+docker run -d -p 8089:9000 \
+--restart=always -v /var/run/docker.sock:/var/run/docker.sock --privileged=true portainer/portainer
+```
+
+访问测试：外网ip:8089
+
+可以通过它来访问了
+
+## Docker镜像讲解
+
+### 镜像是什么
+
+镜像是一种轻量级、可执行的独立软件包，用来打包软件运行环境和基于运行环境开发的软件，它包含运行某个软件所需的所有内容，包括代码、运行时、库、环境变量和配置文件。
+
+所有的应用，直接打包docker镜像，就可以直接跑起来！
+
+如何得到镜像：
+
+* 远程仓库下载
+* 朋友copy给你
+* 自己制作一个镜像DockerFile
+
+### Docker镜像加载原理
+
+> UnionFS(联合文件系统)
+
+联合文件系统（[UnionFS](https://en.wikipedia.org/wiki/UnionFS)）是一种分层、轻量级并且高性能的文件系统，它支持对文件系统的修改作为一次提交来一层层的叠加，同时可以将不同目录挂载到同一个虚拟文件系统下。
+联合文件系统是 Docker 镜像的基础。镜像可以通过分层来进行继承，基于基础镜像（没有父镜像），可以制作各种具体的应用镜像。
+
+特性：一次同时加载多个文件系统，但从外面看起来，只能看到一个文件系统，联合加载会把各层文件系统叠加起来，这样最终的文件系统会包含所有底层的文件和目录。
+
+> Docker镜像加载原理
+
+docker 的镜像实际上由一层一层的文件系统组成，这种层级的文件系统UnionFS。
+
+bootfs(boot file system) 主要包含bootloader和kernel，bootloader 主要是引导加载kernel，Linux刚启动时会加载bootfs文件系统，在Docker镜像的最底层是bootfs。这一层与我们典型的Linux/Unix系统是一样的，包含boot加载器和内核。当boot加载完成之后整个内核就存在内存中了，此时内存的使用权已由bootfs转交给内核，此时系统也会卸载bootfs。
+
+
+
+roorfs （root file system），在bootfs之上。包含的就是典型Linux系统中的 /dev ，/proc，/bin ，/etx 等标准的目录和文件。rootfs就是各种不同的操作系统发行版。比如Ubuntu，Centos等等。
+
+平时我们安装虚拟机的CentOS都是好几个G，为什么docker这里才200M？
+
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20190522121705397.png)
+
+
+
+对于一个精简的OS，rootfs可以很小，只需要包括最基本的命令、工具和程序库就可以了，因为底层直接用Host的kernel，自己只需要提供rootfs就行了。由此可见对于不同的linux发行版，bootfs基本是一致的，rootfs会有差别，因此不同的发行版可以共用bootfs。
+
+虚拟机是分钟级别，容器是秒级！！！
+
+### 分层理解
+
+> 分层的镜像
+
+我们可以去下载一个镜像，注意观察下载的日志输出，可以看到是一层一层的在下载！
+
+**为什么docker镜像要采用这种分层结构呢？**
+
+最大的一个好处就是**共享资源**
+比如：有多个镜像都从相同的base镜像构建而来，那么宿主机只需在磁盘上保存一份base镜像,同时内存中也只需加载一份base镜像，就可以为所有容器服务了。而且镜像的每一层都可以被共享。
+
+> 特点
+
+Docker的镜像都是只读的，当容器启动时，一个新的可写层被加载到镜像的顶部！
+
+这一层就是我们通常说的容器层，容器之下的都叫镜像层！
+
+
+
+**所有用户的操作基于容器层**
+
+如何提交一个自己的镜像？
+
+### Commit镜像

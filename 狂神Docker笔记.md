@@ -819,13 +819,26 @@ docker run -d -P --name nginx01 -v /etc/nginx nginx
 # -P随机端口，-v不指定主机路径
 
 # volume 查看容器内的情况
-docker volume ls
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker volume ls
+DRIVER              VOLUME NAME
+local               d001910b6c2b2ae936aa7c6b5570ab46ca2a1ab742df60914ba80d1b496b5d5c
 
 # 这里发现，这种就是匿名挂载，没有名字，只写了容器内路径，没写容器外的路径。
+
+# 具名挂载
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker run -d -P --name nginx02 -v juming:/etc/nginx nginx
+0dad5dc88ef9c4ce1abb8c06763dcc415cbcef6cb444b555209a5bcc692b07db
+[root@iz2ze4t93bwwn1hyg068wpz ~]# docker volume ls
+DRIVER              VOLUME NAME
+local               d001910b6c2b2ae936aa7c6b5570ab46ca2a1ab742df60914ba80d1b496b5d5c
+local               fc7b1edbb7a377ba75719f039ecdb83e0dbfbae4133cd1ee9b2449129f98745b
+local               juming
 
 # 通过 -v 卷名：容器内路径实现具名
 # 查看以下这个卷
 ```
+
+![image-20201224142504337](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201224142504337.png)
 
 所有的docker容器内的卷，没有指定目录的情况下都是在 **/var/lib/docker/volumes/xxx/_data**  里。
 

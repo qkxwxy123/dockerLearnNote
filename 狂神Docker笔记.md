@@ -717,3 +717,140 @@ Docker的镜像都是只读的，当容器启动时，一个新的可写层被�
 如何提交一个自己的镜像？
 
 ### Commit镜像
+
+```shell
+docker commit 提交容器成为一个新的副本
+# 命令和git原理类似
+docker commit -m="提交的描述信息" -a="作者" 容器id 目标镜像名:[TAG]
+```
+
+实战：
+
+```shell
+# 启动一个默认的tomcat
+
+# 默认的tomcat没有webapps应用，镜像的原因
+
+# 自己拷贝进去基本的文件
+
+# 将操作过的容器通过commit提交为一个镜像，我们以后就使用修改过的镜像即可。
+```
+
+![image-20201217132738564](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201217132738564.png)
+
+```shell
+如果你想要保存当前容器的状态，就可以通过commit来提交，获得一个镜像，就好比学习VM的时候的快照。
+```
+
+## 容器数据卷
+
+### 什么是容器数据卷
+
+程序要保存数据？如果数据都在容器中，容器删除，数据就会丢失。**需求：数据可以持久化**
+
+MySQL，容器删了=删库跑路，**需求：MySQL数据可以存储在本地**
+
+容器之间可以有一个数据共享的技术！Docker容器中产生的数据，同步到本地！
+
+这就是卷技术！实质是目录的挂在，将我们容器内的目录，挂载到Linux上面！
+
+**总结一句话：容器的持久化和同步化操作！容器间也是可以数据共享的！**
+
+### 使用数据卷
+
+> 方式一：直接使用命令来挂载 -v
+
+```shell
+docker run -it -v 主机目录:容器内目录
+
+[root@iz2ze4t93bwwn1hyg068wpz home]# docker run -it -v /home/ceshi:/home centos /bin/bash
+
+# 启动起来之后我们可以通过docker inspect 容器id后可以看到有这个Mounts说明挂载成功。
+```
+
+![image-20201217134613268](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201217134613268.png)
+
+测试文件的同步
+
+![image-20201217135003414](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201217135003414.png)
+
+类似Linux的主从复制，双向绑定的过程，哪怕停止容器在本地修改的文件容器内的文件依旧被修改。
+
+好处：我们以后修改只需要在本地修改即可，容器内会自动同步。
+
+### 实战：安装MySQL
+
+思考：MySQL的数据持久化的问题！（会占用两倍存储）
+
+```shell
+# 获取镜像
+docker pull mysql:5.7
+
+# 运行容器，需要做数据挂载！
+# 安装启动MYSQL，需要配置密码的，这是要注意的！
+# 官方测试：docker run --name some-mysql -e MYSQL_ROOT_PASSWORD=my-secret-pw -d mysql:tag
+
+# 启动我们的mysql
+-d 后台运行
+-p 端口映射
+-v 卷挂载
+-e 环境配置
+--name 容器名字
+[root@iz2ze4t93bwwn1hyg068wpz ceshi]# docker run -d -p 3310:3306 -v /home/mysql/conf:/etc/mysql/conf.d -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=Wxy5211314 --name mysql01 mysql:5.7
+1d712015ff5125638eeeead35d27d9b1a6b9ec9c3afc3c8ce981a8a515bc9ce8
+
+# 启动成功之后，我们在本地使用工具连接测试一下
+
+# 在本地创建一个数据库，在本地文件夹出现数据库，测试成功
+```
+
+![image-20201217140633706](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201217140633706.png)
+
+假设我们将容器删除，我们发现挂载到本地的数据卷依旧没有丢失，实现了持久化功能。
+
+
+
+### 具名和匿名挂载
+
+```shell
+# 匿名挂载
+-v 容器内路径
+docker run -d -P --name nginx01 -v /etc/nginx nginx
+# -P随机端口，-v不指定主机路径
+
+# volume 查看容器内的情况
+docker volume ls
+
+# 这里发现，这种就是匿名挂载，没有名字，只写了容器内路径，没写容器外的路径。
+
+# 通过 -v 卷名：容器内路径实现具名
+# 查看以下这个卷
+```
+
+所有的docker容器内的卷，没有指定目录的情况下都是在 **/var/lib/docker/volumes/xxx/_data**  里。
+
+我们通过具名挂载可以方便的找到我们的一个卷，大多数情况在使用 具名挂载
+
+```shell
+# 如何确定是具名挂载还是匿名挂载，还是指定路径挂载！
+-v 容器内路径            #匿名挂载
+-v 卷名：容器内路径       #具名挂载
+-v /宿主机路径：容器内路径 #指定路径挂载
+```
+
+拓展：
+
+```shell
+# 通过ro rw改变读写权限
+ro # 只读，只能从外部改变
+rw # 可读可写，内部外部都可以改变
+# 一旦设置了这个容器权限，容器对我们挂载出来的内容就有限定了！
+docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx:ro nginx
+docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx:rw nginx
+```
+
+## DockerFile
+
+
+
+## Docker 网络

@@ -862,8 +862,94 @@ docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx:ro nginx
 docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx:rw nginx
 ```
 
+## 初识DockerFile
+
+Dockerfile就是用来构建docker镜像的构建文件！命令脚本！
+
+通过这个脚本可以生成镜像，镜像是一层一层的，因此脚本就是一个一个的命令，每个命令都是一层。
+
+```shell
+# 创建一个dockerfile文件，名字可以随机，但是建议就是Dockerfile
+# 文件的内容： 指令(必须大写) 参数
+
+FROM centos
+
+VOLUME ["volume01", "volume02"]
+
+CMD echo "----end----"
+
+CMD /bin/bash
+
+# 这里每个命令，就是镜像的一层
+```
+
+![image-20201225200240539](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225200240539.png)
+
+```shell
+# 启动自己的镜像
+```
+
+可以看到有volume1和2两个自动挂载的数据卷目录
+
+![image-20201225200533701](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225200533701.png)
+
+这个卷和外部一定有一个同步的目录
+
+![image-20201225201031945](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225201031945.png)
+
+测试一下是否同步
+
+这种方式我们未来使用的十分多，因为我们通常会构建自己的镜像！
+
+假设构建镜像的时候没有挂载卷，要手动镜像挂载 -v 卷名：容器内路径
+
+
+
+
+
+## 数据卷容器
+
+例如两个甚至多个mysql同步数据
+
+![image-20201225205937817](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225205937817.png)
+
+```shell
+# 启动3个容器，通过我们刚才自己写的镜像启动
+```
+
+![image-20201225210236936](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225210236936.png)
+
+在docker01容器中创建docker01
+
+![image-20201225210537160](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225210537160.png)
+
+在docker02容器中可以看到docker01
+
+![image-20201225210514868](C:\Users\kxxy\AppData\Roaming\Typora\typora-user-images\image-20201225210514868.png)
+
+再创建docker03同样可以实现同步。
+
+本质是多个容器挂载在同一个地方，像是同步而已。
+
+其中一个容器删除，其他容器同样可以访问数据，数据是保存到了本地，并不是在容器中，一种**备份机制**。
+
+
+
+多个mysql实现共享数据
+
+```shell
+[root@iz2ze4t93bwwn1hyg068wpz ceshi]# docker run -d -p 3310:3306 -v /home/mysql/conf:/etc/mysql/conf.d -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=XXX --name mysql01 mysql:5.7
+[root@iz2ze4t93bwwn1hyg068wpz ceshi]# docker run -d -p 3311:3306 -e MYSQL_ROOT_PASSWORD=XXX --name mysql02 --volumes-from mysql01 mysql:5.7
+
+# 实现两个容器数据同步
+```
+
+结论：
+
+可以进行：容器之间配置信息的传递，数据卷容器的生命周期一直持续到没有人使用为止。
+
+但是一旦持久化到了本地，-v操作，本地的数据是不会删除的！
+
 ## DockerFile
-
-
 
 ## Docker 网络
